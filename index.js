@@ -32,8 +32,7 @@ client.on('message', async (msg) => {
     }else{
       try {
         const response = await forwardMessageToWebhook(msg); // ✅ Await the response
-        await msg.reply(response); 
-         msg.reply(response);
+        msg.reply(response);
     } catch (error) {
         console.error('Failed to forward message:', error.message);
     }
