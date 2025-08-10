@@ -25,7 +25,12 @@ client.on('ready', () => {
 });
 
 client.on('message', async (msg) => {
-   
+
+    if(msg.fromMe){
+      return;
+    }
+    
+    // console.debug(msg);
     // Example command
     if (msg.body === '!ping') {
         msg.reply('pong');
@@ -45,9 +50,20 @@ client.on('message', async (msg) => {
  * @returns {Promise<object>} - Axios response data
  */
 async function forwardMessageToWebhook(msg) {
+  
+  // Retrieve contact object and formatted number
+  contact = await msg.getContact();
+  chat = await msg.getChat();
+
+  console.log('Contact is group: ', chat.isGroup);
+  console.log('Message Author Group: ', msg.author);
+  console.log('Mobile Number:', contact.number);
+
   try {
     const payload = {
-      from: msg.from,
+      isGroup: chat.isGroup,
+      rawFrom: msg.from,
+      from: contact.number,
       body: msg.body,
       timestamp: msg.timestamp,
       id: msg.id._serialized,
