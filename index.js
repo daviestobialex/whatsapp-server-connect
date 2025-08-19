@@ -103,7 +103,7 @@ app.post("/send-whatsapp", async (req, res) => {
     }
 
     // 'to' must be in WhatsApp ID format → "<phone>@c.us"
-    const chatId = to.includes("@c.us") ? to : `${to}@c.us`;
+    const chatId = to.includes("@c.us") || to.includes("@g.us") ? to : `${to}@c.us`;
 
     await client.sendMessage(chatId, message);
 
