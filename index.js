@@ -1,3 +1,6 @@
+const express = require("express");
+const bodyParser = require("body-parser");
+
 const { Client } = require('whatsapp-web.js');
 const axios = require('axios');
 const qrcode = require('qrcode-terminal');
@@ -52,8 +55,8 @@ client.on('message', async (msg) => {
 async function forwardMessageToWebhook(msg) {
   
   // Retrieve contact object and formatted number
-  contact = await msg.getContact();
-  chat = await msg.getChat();
+  const contact = await msg.getContact();
+  const chat = await msg.getChat();
 
   console.log('Contact is group: ', chat.isGroup);
   console.log('Message Author Group: ', msg.author);
@@ -84,6 +87,36 @@ async function forwardMessageToWebhook(msg) {
 }
 
 client.initialize();
+
+
+const app = express();             // ✅ define express app
+app.use(bodyParser.json());        // ✅ middleware for parsing JSON
+
+// POST /send-whatsapp
+app.post("/send-whatsapp", async (req, res) => {
+  try {
+    const { to, message } = req.body;
+
+    if (!to || !message) {
+      return res.status(400).json({ error: "Missing 'to' or 'message' field" });
+    }
+
+    // 'to' must be in WhatsApp ID format → "<phone>@c.us"
+    const chatId = to.includes("@c.us") ? to : `${to}@c.us`;
+
+    await client.sendMessage(chatId, message);
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error("Error sending WhatsApp message:", err);
+    res.status(500).json({ error: "Failed to send WhatsApp message" });
+  }
+});
+
+const PORT = process.env.PORT || 223;
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+});
 
 
 module.exports = { forwardMessageToWebhook };
