@@ -94,6 +94,7 @@ app.use(bodyParser.json());        // ✅ middleware for parsing JSON
 
 // POST /send-whatsapp
 app.post("/send-whatsapp", async (req, res) => {
+  console.log('Outgoing Msg: ', req.body);
   try {
     const { to, message } = req.body;
 
